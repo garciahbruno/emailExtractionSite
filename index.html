@@ -5,7 +5,7 @@
   <style>
     body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; }
     textarea { width: 100%; height: 150px; margin-bottom: 1rem; }
-    button { padding: 0.5rem 1rem; font-size: 1rem; margin-right: 0.5rem; }
+    button { padding: 0.5rem 1rem; font-size: 1rem; margin: 0.25rem 0.25rem 1rem 0; }
     pre { background: #f0f0f0; padding: 1rem; white-space: pre-wrap; }
   </style>
 </head>
@@ -15,36 +15,48 @@
   <p>Paste your text below and click "Extract Emails":</p>
 
   <textarea id="inputText" placeholder="Paste text here..."></textarea>
+  <br>
   <button onclick="extractEmails()">Extract Emails</button>
-  <button onclick="copyOutput()">Copy All</button>
+  <button onclick="copyOriginal()">Copy All (Originals)</button>
+  <button onclick="copyMedRemoved()">Copy All (@med ➜ @umich)</button>
 
   <h3>Results:</h3>
   <pre id="output"></pre>
 
   <script>
+    let originalEmails = [];
+
     function extractEmails() {
       const text = document.getElementById('inputText').value;
       const pattern = /[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9.-]*\.)+[A-Za-z]{2,}[;,]?/g;
       const rawMatches = text.match(pattern) || [];
-      const cleaned = rawMatches.map(email => email.replace(/[;,]$/, ''));
 
-      const allEmails = [];
-
-      cleaned.forEach(email => {
-        allEmails.push(email);
-        if (email.endsWith('@med.umich.edu')) {
-          allEmails.push(email.replace('@med.umich.edu', '@umich.edu'));
-        }
-      });
-
-      const uniqueEmails = [...new Set(allEmails)];
-      document.getElementById('output').textContent = uniqueEmails.join('\n');
+      // Clean emails and remove trailing punctuation
+      originalEmails = rawMatches.map(email => email.replace(/[;,]$/, ''));
+      
+      // Remove duplicates and display
+      const uniqueOriginals = [...new Set(originalEmails)];
+      document.getElementById('output').textContent = uniqueOriginals.join('\n');
     }
 
-    function copyOutput() {
-      const output = document.getElementById('output').textContent;
-      navigator.clipboard.writeText(output)
-        .then(() => alert('Copied to clipboard!'))
+    function copyOriginal() {
+      const text = [...new Set(originalEmails)].join('\n');
+      copyToClipboard(text, 'Copied original emails!');
+    }
+
+    function copyMedRemoved() {
+      const converted = originalEmails.map(email =>
+        email.endsWith('@med.umich.edu')
+          ? email.replace('@med.umich.edu', '@umich.edu')
+          : email
+      );
+      const uniqueConverted = [...new Set(converted)].join('\n');
+      copyToClipboard(uniqueConverted, 'Copied with @med replaced!');
+    }
+
+    function copyToClipboard(text, successMessage) {
+      navigator.clipboard.writeText(text)
+        .then(() => alert(successMessage))
         .catch(() => alert('Failed to copy.'));
     }
   </script>
