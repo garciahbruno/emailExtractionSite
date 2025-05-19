@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Email Extractor</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; }
+    textarea { width: 100%; height: 150px; margin-bottom: 1rem; }
+    button { padding: 0.5rem 1rem; font-size: 1rem; }
+    pre { background: #f0f0f0; padding: 1rem; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+
+  <h2>Email Extractor</h2>
+  <p>Paste your text below and click "Extract Emails":</p>
+
+  <textarea id="inputText" placeholder="Paste text here..."></textarea>
+  <button onclick="extractEmails()">Extract Emails</button>
+
+  <h3>Result:</h3>
+  <pre id="output"></pre>
+
+  <script>
+    function extractEmails() {
+      const text = document.getElementById('inputText').value;
+      const pattern = /[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9.-]*\.)+[A-Za-z]{2,}[;,]?/g;
+      const rawMatches = text.match(pattern) || [];
+      const cleaned = rawMatches.map(email => email.replace(/[;,]$/, ''));
+      document.getElementById('output').textContent = cleaned.join('\n');
+    }
+  </script>
+
+</body>
+</html>
