@@ -5,13 +5,8 @@
   <style>
     body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; }
     textarea { width: 100%; height: 150px; margin-bottom: 1rem; }
-    button.copy-btn {
-      margin-left: 0.5rem;
-      font-size: 0.85rem;
-      padding: 0.25rem 0.5rem;
-    }
-    .email-block { margin-bottom: 1rem; }
-    .email-text { font-weight: bold; }
+    button { padding: 0.5rem 1rem; font-size: 1rem; margin-right: 0.5rem; }
+    pre { background: #f0f0f0; padding: 1rem; white-space: pre-wrap; }
   </style>
 </head>
 <body>
@@ -21,56 +16,36 @@
 
   <textarea id="inputText" placeholder="Paste text here..."></textarea>
   <button onclick="extractEmails()">Extract Emails</button>
+  <button onclick="copyOutput()">Copy All</button>
 
   <h3>Results:</h3>
-  <div id="output"></div>
+  <pre id="output"></pre>
 
   <script>
     function extractEmails() {
       const text = document.getElementById('inputText').value;
       const pattern = /[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9.-]*\.)+[A-Za-z]{2,}[;,]?/g;
       const rawMatches = text.match(pattern) || [];
-      const cleanedEmails = rawMatches.map(email => email.replace(/[;,]$/, ''));
+      const cleaned = rawMatches.map(email => email.replace(/[;,]$/, ''));
 
-      const outputDiv = document.getElementById('output');
-      outputDiv.innerHTML = ''; // clear previous results
+      const allEmails = [];
 
-      cleanedEmails.forEach(email => {
-        const container = document.createElement('div');
-        container.className = 'email-block';
-
-        const emailSpan = document.createElement('span');
-        emailSpan.textContent = email;
-        emailSpan.className = 'email-text';
-        container.appendChild(emailSpan);
-
-        // Always add copy button for the original
-        container.appendChild(createCopyButton(email));
-
-        // If @med.umich.edu, add a second button for modified version
+      cleaned.forEach(email => {
+        allEmails.push(email);
         if (email.endsWith('@med.umich.edu')) {
-          const modified = email.replace('@med.umich.edu', '@umich.edu');
-          container.appendChild(createCopyButton(modified, 'Copy @umich.edu version'));
+          allEmails.push(email.replace('@med.umich.edu', '@umich.edu'));
         }
-
-        outputDiv.appendChild(container);
       });
+
+      const uniqueEmails = [...new Set(allEmails)];
+      document.getElementById('output').textContent = uniqueEmails.join('\n');
     }
 
-    function createCopyButton(textToCopy, label = 'Copy') {
-      const button = document.createElement('button');
-      button.textContent = label;
-      button.className = 'copy-btn';
-      button.onclick = async () => {
-        try {
-          await navigator.clipboard.writeText(textToCopy);
-          button.textContent = 'Copied!';
-          setTimeout(() => button.textContent = label, 1000);
-        } catch (err) {
-          alert('Failed to copy!');
-        }
-      };
-      return button;
+    function copyOutput() {
+      const output = document.getElementById('output').textContent;
+      navigator.clipboard.writeText(output)
+        .then(() => alert('Copied to clipboard!'))
+        .catch(() => alert('Failed to copy.'));
     }
   </script>
 
