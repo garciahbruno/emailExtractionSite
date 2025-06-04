@@ -20,8 +20,11 @@
   <button onclick="copyOriginal()">Copy All (Originals)</button>
   <button onclick="copyMedRemoved()">Copy All (@med ➜ @umich)</button>
 
-  <h3>Results:</h3>
+  <h3>Original Emails:</h3>
   <pre id="output"></pre>
+
+  <h3>Converted Emails (@med ➜ @umich):</h3>
+  <pre id="convertedOutput"></pre>
 
   <script>
     let originalEmails = [];
@@ -31,12 +34,17 @@
       const pattern = /[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9.-]*\.)+[A-Za-z]{2,}[;,]?/g;
       const rawMatches = text.match(pattern) || [];
 
-      // Clean emails and remove trailing punctuation
       originalEmails = rawMatches.map(email => email.replace(/[;,]$/, ''));
-      
-      // Remove duplicates and display
       const uniqueOriginals = [...new Set(originalEmails)];
+
       document.getElementById('output').textContent = uniqueOriginals.join('\n');
+
+      const converted = uniqueOriginals.map(email =>
+        email.endsWith('@med.umich.edu')
+          ? email.replace('@med.umich.edu', '@umich.edu')
+          : email
+      );
+      document.getElementById('convertedOutput').textContent = [...new Set(converted)].join('\n');
     }
 
     function copyOriginal() {
