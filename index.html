@@ -78,14 +78,15 @@
       document.getElementById('convertedBox').textContent = convertedEmails.join('\n');
 
       // Spreadsheet output
-      let spreadsheet = 'First Name\tLast Name\tmed.umich email\tumich email\n';
+      let spreadsheet = 'First Name,Last Name,med.umich email,umich email\n';
+
       medEmails.forEach((medEmail, i) => {
         const emailPrefix = medEmail.split('@')[0];
         const parts = emailPrefix.split(/[._]/); // Split on . or _
         const firstName = parts[0] || '';
         const lastName = parts[1] || '';
         const converted = convertedEmails[i];
-        spreadsheet += `${firstName}\t${lastName}\t${medEmail}\t${converted}\n`;
+        spreadsheet += `${firstName},${lastName},${medEmail},${converted}\n`;
       });
 
       document.getElementById('spreadsheetBox').textContent = spreadsheet.trim();
