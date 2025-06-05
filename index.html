@@ -70,39 +70,30 @@
 
     function extractEmails() {
       const text = document.getElementById('inputText').value;
-      const pattern = /[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9.-]*\.)+[A-Za-z]{2,}[;,]?/g;
-      const rawMatches = text.match(pattern) || [];
 
-      // Clean and deduplicate
-      originalEmails = rawMatches.map(email => email.replace(/[;,]$/, ''));
-      const uniqueOriginals = [...new Set(originalEmails)];
+      const pattern = /([\w\-']+),\s+([\w\-']+)\s+<([\w.+-]+@med\.umich\.edu)>/gi;
+      let match;
+      const medEmails = [];
+      const convertedEmails = [];
+      let spreadsheet = 'First Name\tLast Name\tmed.umich email\tumich email\n';
 
-      // Filter med emails
-      const medEmails = uniqueOriginals.filter(email => email.includes('@med.umich.edu'));
-      const convertedEmails = medEmails.map(email => email.replace('@med.umich.edu', '@umich.edu'));
+      while ((match = pattern.exec(text)) !== null) {
+        const lastName = match[1].toLowerCase();
+        const firstName = match[2].toLowerCase();
+        const medEmail = match[3].toLowerCase();
+        const umichEmail = medEmail.replace('@med.umich.edu', '@umich.edu');
 
-      // Display original and converted emails
+        medEmails.push(medEmail);
+        convertedEmails.push(umichEmail);
+        spreadsheet += `${firstName}\t${lastName}\t${medEmail}\t${umichEmail}\n`;
+      }
+
       document.getElementById('medBox').textContent = medEmails.join('\n');
       document.getElementById('convertedBox').textContent = convertedEmails.join('\n');
-
-      // Spreadsheet output
-      let spreadsheet = 'First Name\tLast Name\tmed.umich email\tumich email\n';;
-
-      medEmails.forEach((medEmail, i) => {
-        const emailPrefix = medEmail.split('@')[0];
-        const parts = emailPrefix.split(/[._]/); // Split on . or _
-        const firstName = parts[0] || '';
-        const lastName = parts[1] || '';
-        const converted = convertedEmails[i];
-        spreadsheet += `${firstName}\t${lastName}\t${medEmail}\t${converted}\n`;
-
-      });
-
       document.getElementById('spreadsheetBox').textContent = spreadsheet.trim();
       document.getElementById('csvCopyBuffer').value = spreadsheet.trim();
-      
-
     }
+
 
     function copyOriginal() {
       const text = [...new Set(originalEmails)].join('\n');
