@@ -45,20 +45,21 @@
   <textarea id="inputText" placeholder="Paste text here..."></textarea>
   <br>
   <button onclick="extractEmails()">Extract Emails</button>
-  <button onclick="copyOriginal()">Copy All (Originals)</button>
-  <button onclick="copyMedRemoved()">Copy All (@med ➜ @umich)</button>
 
   <h3>Results:</h3>
   <div class="output-container">
     <div class="output-box">
       <strong>@med.umich.edu Emails</strong>
       <pre id="medBox"></pre>
+      <button onclick="copyOriginal()">Copy All (Originals)</button>
     </div>
     <div class="output-box">
       <strong>Converted (@umich.edu)</strong>
       <pre id="convertedBox"></pre>
+      <button onclick="copyMedRemoved()">Copy All (@med ➜ @umich)</button>
     </div>
   </div>
+
 
   <h3>Spreadsheet Format:</h3>
   <pre class="spreadsheet-box" id="spreadsheetBox"></pre>
