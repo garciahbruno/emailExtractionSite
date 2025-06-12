@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html>
 <head>
   <title>Email Extractor</title>
@@ -113,7 +114,7 @@
     function copyToClipboard(text, successMessage) {
       navigator.clipboard.writeText(text)
         .then(() => alert(successMessage))
-        .catch(() => alert('Failed to copy.'));
+        .catch(() => alert('Failed to copy'));
     }
     function copySpreadsheet() {
       const textarea = document.getElementById('csvCopyBuffer');
