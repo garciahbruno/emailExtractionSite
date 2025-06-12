@@ -76,7 +76,8 @@
       let match;
       const medEmails = [];
       const convertedEmails = [];
-      let spreadsheet = 'First Name\tLast Name\tmed.umich email\tumich email\n';
+      let spreadsheet = 'Full Name\tmed.umich email\tumich email\tuniqname\n';
+
 
       while ((match = pattern.exec(text)) !== null) {
         const lastName = match[1].toLowerCase();
@@ -86,7 +87,10 @@
 
         medEmails.push(medEmail);
         convertedEmails.push(umichEmail);
-        spreadsheet += `${firstName}\t${lastName}\t${medEmail}\t${umichEmail}\n`;
+        const fullName = `${firstName.charAt(0).toUpperCase() + firstName.slice(1)} ${lastName.charAt(0).toUpperCase() + lastName.slice(1)}`;
+        const uniqname = medEmail.split('@')[0];
+        spreadsheet += `${fullName}\t${medEmail}\t${umichEmail}\t${uniqname}\n`;
+
       }
 
       document.getElementById('medBox').textContent = medEmails.join('\n');
