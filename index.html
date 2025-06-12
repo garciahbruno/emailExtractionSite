@@ -86,41 +86,41 @@
 
     function extractEmails() {
       const text = document.getElementById('inputText').value;
-
+    
       const pattern = /([\w\-']+),\s+([\w\-']+)\s+<([\w.+-]+@med\.umich\.edu)>/gi;
       let match;
+    
       const medEmails = [];
       const convertedEmails = [];
       const fullNames = [];
       const uniqnames = [];
-
+    
       let spreadsheet = 'Full Name\tmed.umich email\tumich email\tuniqname\n';
-
-
+    
       while ((match = pattern.exec(text)) !== null) {
         const lastName = match[1].toLowerCase();
         const firstName = match[2].toLowerCase();
         const medEmail = match[3].toLowerCase();
         const umichEmail = medEmail.replace('@med.umich.edu', '@umich.edu');
+    
         const fullName = `${firstName.charAt(0).toUpperCase() + firstName.slice(1)} ${lastName.charAt(0).toUpperCase() + lastName.slice(1)}`;
         const uniqname = medEmail.split('@')[0];
-        
-        fullNames.push(fullName);
-        uniqnames.push(uniqname);
+    
         medEmails.push(medEmail);
         convertedEmails.push(umichEmail);
-        const fullName = `${firstName.charAt(0).toUpperCase() + firstName.slice(1)} ${lastName.charAt(0).toUpperCase() + lastName.slice(1)}`;
-        const uniqname = medEmail.split('@')[0];
+        fullNames.push(fullName);
+        uniqnames.push(uniqname);
+    
         spreadsheet += `${fullName}\t${medEmail}\t${umichEmail}\t${uniqname}\n`;
-
       }
-
+      originalEmails = medEmails;
+    
       document.getElementById('medBox').textContent = medEmails.join('\n');
       document.getElementById('convertedBox').textContent = convertedEmails.join('\n');
-      document.getElementById('spreadsheetBox').textContent = spreadsheet.trim();
-      document.getElementById('csvCopyBuffer').value = spreadsheet.trim();
       document.getElementById('nameBox').textContent = fullNames.join('\n');
       document.getElementById('uniqBox').textContent = uniqnames.join('\n');
+      document.getElementById('spreadsheetBox').textContent = spreadsheet.trim();
+      document.getElementById('csvCopyBuffer').value = spreadsheet.trim();
     }
 
 
