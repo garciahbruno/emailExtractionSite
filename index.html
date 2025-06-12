@@ -49,16 +49,30 @@
   <h3>Results:</h3>
   <div class="output-container">
     <div class="output-box">
-      <strong>@med.umich.edu Emails</strong>
-      <pre id="medBox"></pre>
-      <button onclick="copyOriginal()">Copy All (Originals)</button>
-    </div>
-    <div class="output-box">
       <strong>Converted (@umich.edu)</strong>
       <pre id="convertedBox"></pre>
-      <button onclick="copyMedRemoved()">Copy All (@med ➜ @umich)</button>
+      <button onclick="copyConverted()">Copy umich.edu emails</button>
+    </div>
+    <div class="output-box">
+      <strong>@med.umich.edu Emails</strong>
+      <pre id="medBox"></pre>
+      <button onclick="copyOriginal()">Copy med.umich.edu emails</button>
     </div>
   </div>
+  
+  <div class="output-container">
+    <div class="output-box">
+      <strong>Full Names</strong>
+      <pre id="nameBox"></pre>
+      <button onclick="copyNames()">Copy name</button>
+    </div>
+    <div class="output-box">
+      <strong>Uniqnames</strong>
+      <pre id="uniqBox"></pre>
+      <button onclick="copyUniqnames()">Copy uniqname</button>
+    </div>
+  </div>
+
 
 
   <h3>Spreadsheet Format:</h3>
@@ -77,6 +91,9 @@
       let match;
       const medEmails = [];
       const convertedEmails = [];
+      const fullNames = [];
+      const uniqnames = [];
+
       let spreadsheet = 'Full Name\tmed.umich email\tumich email\tuniqname\n';
 
 
@@ -85,7 +102,11 @@
         const firstName = match[2].toLowerCase();
         const medEmail = match[3].toLowerCase();
         const umichEmail = medEmail.replace('@med.umich.edu', '@umich.edu');
-
+        const fullName = `${firstName.charAt(0).toUpperCase() + firstName.slice(1)} ${lastName.charAt(0).toUpperCase() + lastName.slice(1)}`;
+        const uniqname = medEmail.split('@')[0];
+        
+        fullNames.push(fullName);
+        uniqnames.push(uniqname);
         medEmails.push(medEmail);
         convertedEmails.push(umichEmail);
         const fullName = `${firstName.charAt(0).toUpperCase() + firstName.slice(1)} ${lastName.charAt(0).toUpperCase() + lastName.slice(1)}`;
@@ -98,6 +119,8 @@
       document.getElementById('convertedBox').textContent = convertedEmails.join('\n');
       document.getElementById('spreadsheetBox').textContent = spreadsheet.trim();
       document.getElementById('csvCopyBuffer').value = spreadsheet.trim();
+      document.getElementById('nameBox').textContent = fullNames.join('\n');
+      document.getElementById('uniqBox').textContent = uniqnames.join('\n');
     }
 
 
@@ -128,6 +151,21 @@
       document.execCommand('copy');
       alert('Spreadsheet copied — paste into Google Sheets!');
     }
+    function copyConverted() {
+      const text = document.getElementById('convertedBox').textContent;
+      copyToClipboard(text, 'Copied umich.edu emails!');
+    }
+    
+    function copyNames() {
+      const text = document.getElementById('nameBox').textContent;
+      copyToClipboard(text, 'Copied full names!');
+    }
+    
+    function copyUniqnames() {
+      const text = document.getElementById('uniqBox').textContent;
+      copyToClipboard(text, 'Copied uniqnames!');
+    }
+
   </script>
 
 </body>
