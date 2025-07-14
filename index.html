@@ -100,10 +100,16 @@
       while ((match = pattern.exec(text)) !== null) {
         const lastName = match[1].toLowerCase();
         const firstName = match[2].toLowerCase();
-        const medEmail = match[3].toLowerCase();
+        const nickname = match[3] ? match[3].trim() : "";
+        const medEmail = match[4].toLowerCase();
         const umichEmail = medEmail.replace('@med.umich.edu', '@umich.edu');
     
-        const fullName = `${firstName.charAt(0).toUpperCase() + firstName.slice(1)} ${lastName.charAt(0).toUpperCase() + lastName.slice(1)}`;
+        let fullName = `${firstName.charAt(0).toUpperCase() + firstName.slice(1)}`;
+        if (nickname) {
+          fullName += ` ${nickname}`;
+        }
+        fullName += ` ${lastName.charAt(0).toUpperCase() + lastName.slice(1)}`;
+    
         const uniqname = medEmail.split('@')[0];
     
         medEmails.push(medEmail);
@@ -122,6 +128,7 @@
       document.getElementById('spreadsheetBox').textContent = spreadsheet.trim();
       document.getElementById('csvCopyBuffer').value = spreadsheet.trim();
     }
+
 
 
     function copyOriginal() {
