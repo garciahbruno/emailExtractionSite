@@ -87,7 +87,7 @@
     function extractEmails() {
       const text = document.getElementById('inputText').value;
     
-      const pattern = /([\w\-']+),\s+([\w\-']+)\s+<([\w.+-]+@med\.umich\.edu)>/gi;
+      const pattern = /([\w\-']+),\s+([\w\-']+)(\s+\([\w\-']+\))?\s+<([\w.+-]+@med\.umich\.edu)>/gi;
       let match;
     
       const medEmails = [];
