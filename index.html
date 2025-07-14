@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
 <head>
   <title>Email Extractor</title>
@@ -12,15 +11,15 @@
       display: flex;
       gap: 1rem;
       margin-top: 1rem;
+      flex-wrap: wrap;
     }
-
     .output-box {
       flex: 1;
+      min-width: 250px;
       background-color: #f0f0f0;
       padding: 1rem;
       border-radius: 5px;
     }
-
     .spreadsheet-box {
       background-color: #f9f9f9;
       padding: 1rem;
@@ -34,7 +33,6 @@
       font-size: 1rem;
       margin-top: 0.5rem;
     }
-
   </style>
 </head>
 <body>
@@ -54,12 +52,12 @@
       <button onclick="copyConverted()">Copy umich.edu emails</button>
     </div>
     <div class="output-box">
-      <strong>@med.umich.edu Emails</strong>
+      <strong>Original Emails</strong>
       <pre id="medBox"></pre>
-      <button onclick="copyOriginal()">Copy med.umich.edu emails</button>
+      <button onclick="copyOriginal()">Copy original emails</button>
     </div>
   </div>
-  
+
   <div class="output-container">
     <div class="output-box">
       <strong>Full Names</strong>
@@ -73,12 +71,9 @@
     </div>
   </div>
 
-
-
   <h3>Spreadsheet Format:</h3>
   <pre class="spreadsheet-box" id="spreadsheetBox"></pre>
   <textarea id="csvCopyBuffer" style="opacity: 0; position: absolute; left: -9999px;"></textarea>
-
   <button onclick="copySpreadsheet()">Copy CSV</button>
 
   <script>
@@ -86,41 +81,43 @@
 
     function extractEmails() {
       const text = document.getElementById('inputText').value;
-    
-      const pattern = /([\w\-']+),\s+([\w\-']+)(\s+\([\w\-']+\))?\s+<([\w.+-]+@med\.umich\.edu)>/gi;
+
+      const pattern = /([\w\-']+),\s+([\w\-']+)(?:\s+\(([\w\-']+)\))?\s+<([\w.+-]+@(?:med\.)?umich\.edu)>/gi;
       let match;
-    
+
       const medEmails = [];
       const convertedEmails = [];
       const fullNames = [];
       const uniqnames = [];
-    
-      let spreadsheet = 'Full Name\tmed.umich email\tumich email\tuniqname\n';
-    
+
+      let spreadsheet = 'Full Name\tOriginal Email\tumich.edu Email\tUniqname\n';
+
       while ((match = pattern.exec(text)) !== null) {
         const lastName = match[1].toLowerCase();
         const firstName = match[2].toLowerCase();
         const nickname = match[3] ? match[3].trim() : "";
-        const medEmail = match[4].toLowerCase();
-        const umichEmail = medEmail.replace('@med.umich.edu', '@umich.edu');
-    
+        const email = match[4].toLowerCase();
+
+        const umichEmail = email.replace('@med.umich.edu', '@umich.edu');
+
         let fullName = `${firstName.charAt(0).toUpperCase() + firstName.slice(1)}`;
         if (nickname) {
-          fullName += ` ${nickname}`;
+          fullName += ` (${nickname})`;
         }
         fullName += ` ${lastName.charAt(0).toUpperCase() + lastName.slice(1)}`;
-    
-        const uniqname = medEmail.split('@')[0];
-    
-        medEmails.push(medEmail);
+
+        const uniqname = email.split('@')[0];
+
+        medEmails.push(email);
         convertedEmails.push(umichEmail);
         fullNames.push(fullName);
         uniqnames.push(uniqname);
-    
-        spreadsheet += `${fullName}\t${medEmail}\t${umichEmail}\t${uniqname}\n`;
+
+        spreadsheet += `${fullName}\t${email}\t${umichEmail}\t${uniqname}\n`;
       }
+
       originalEmails = medEmails;
-    
+
       document.getElementById('medBox').textContent = medEmails.join('\n');
       document.getElementById('convertedBox').textContent = convertedEmails.join('\n');
       document.getElementById('nameBox').textContent = fullNames.join('\n');
@@ -129,21 +126,9 @@
       document.getElementById('csvCopyBuffer').value = spreadsheet.trim();
     }
 
-
-
     function copyOriginal() {
       const text = [...new Set(originalEmails)].join('\n');
       copyToClipboard(text, 'Copied original emails!');
-    }
-
-    function copyMedRemoved() {
-      const converted = originalEmails.map(email =>
-        email.endsWith('@med.umich.edu')
-          ? email.replace('@med.umich.edu', '@umich.edu')
-          : email
-      );
-      const uniqueConverted = [...new Set(converted)].join('\n');
-      copyToClipboard(uniqueConverted, 'Copied with @med replaced!');
     }
 
     function copyToClipboard(text, successMessage) {
@@ -151,28 +136,29 @@
         .then(() => alert(successMessage))
         .catch(() => alert('Failed to copy'));
     }
+
     function copySpreadsheet() {
       const textarea = document.getElementById('csvCopyBuffer');
       textarea.select();
-      textarea.setSelectionRange(0, 99999); // for mobile
+      textarea.setSelectionRange(0, 99999);
       document.execCommand('copy');
-      alert('Spreadsheet copied — paste into Google Sheets!');
+      alert('Spreadsheet copied!');
     }
+
     function copyConverted() {
       const text = document.getElementById('convertedBox').textContent;
       copyToClipboard(text, 'Copied umich.edu emails!');
     }
-    
+
     function copyNames() {
       const text = document.getElementById('nameBox').textContent;
       copyToClipboard(text, 'Copied full names!');
     }
-    
+
     function copyUniqnames() {
       const text = document.getElementById('uniqBox').textContent;
       copyToClipboard(text, 'Copied uniqnames!');
     }
-
   </script>
 
 </body>
