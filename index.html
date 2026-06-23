@@ -82,9 +82,6 @@
     function extractEmails() {
       const text = document.getElementById('inputText').value;
 
-      const pattern = /([^,<]+),\s*([^<()]+?)(?:\s+\(([^)]+)\))?\s*<([\w.+-]+@(?:med\.)?umich\.edu)>/gi;
-      let match;
-
       const medEmails = [];
       const convertedEmails = [];
       const fullNames = [];
@@ -92,11 +89,24 @@
 
       let spreadsheet = 'Full Name\tOriginal Email\tumich.edu Email\tUniqname\n';
 
-      while ((match = pattern.exec(text)) !== null) {
-        const lastName = match[1].trim().toLowerCase();
-        const firstName = match[2].trim().toLowerCase();
-        const nickname = match[3] ? match[3].trim() : "";
-        const email = match[4].toLowerCase();
+      text.split(/[;\n]+/).forEach(entry => {
+        const emailMatch = entry.match(/[\w.+-]+@(?:med\.)?umich\.edu/i);
+        if (!emailMatch) {
+          return;
+        }
+
+        const namePart = entry.slice(0, emailMatch.index).replace(/<\s*$/, '').trim();
+        const nameMatch = namePart.match(/^([^,]+),\s*(.+)$/);
+        if (!nameMatch) {
+          return;
+        }
+
+        const lastName = nameMatch[1].trim().toLowerCase();
+        const firstNamePart = nameMatch[2].trim().toLowerCase();
+        const nicknameMatch = firstNamePart.match(/^(.*?)\s+\(([^)]+)\)$/);
+        const firstName = nicknameMatch ? nicknameMatch[1].trim() : firstNamePart;
+        const nickname = nicknameMatch ? nicknameMatch[2].trim() : "";
+        const email = emailMatch[0].toLowerCase();
 
         const umichEmail = email.replace('@med.umich.edu', '@umich.edu');
 
@@ -114,7 +124,7 @@
         uniqnames.push(uniqname);
 
         spreadsheet += `${fullName}\t${email}\t${umichEmail}\t${uniqname}\n`;
-      }
+      });
 
       originalEmails = medEmails;
 
