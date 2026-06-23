@@ -82,7 +82,7 @@
     function extractEmails() {
       const text = document.getElementById('inputText').value;
 
-      const pattern = /([\w\-']+),\s+([\w\-']+)(?:\s+\(([\w\-']+)\))?\s+<([\w.+-]+@(?:med\.)?umich\.edu)>/gi;
+      const pattern = /([^,<]+),\s*([^<()]+?)(?:\s+\(([^)]+)\))?\s*<([\w.+-]+@(?:med\.)?umich\.edu)>/gi;
       let match;
 
       const medEmails = [];
@@ -93,18 +93,18 @@
       let spreadsheet = 'Full Name\tOriginal Email\tumich.edu Email\tUniqname\n';
 
       while ((match = pattern.exec(text)) !== null) {
-        const lastName = match[1].toLowerCase();
-        const firstName = match[2].toLowerCase();
+        const lastName = match[1].trim().toLowerCase();
+        const firstName = match[2].trim().toLowerCase();
         const nickname = match[3] ? match[3].trim() : "";
         const email = match[4].toLowerCase();
 
         const umichEmail = email.replace('@med.umich.edu', '@umich.edu');
 
-        let fullName = `${firstName.charAt(0).toUpperCase() + firstName.slice(1)}`;
+        let fullName = titleCaseName(firstName);
         if (nickname) {
           fullName += ` (${nickname})`;
         }
-        fullName += ` ${lastName.charAt(0).toUpperCase() + lastName.slice(1)}`;
+        fullName += ` ${titleCaseName(lastName)}`;
 
         const uniqname = email.split('@')[0];
 
@@ -124,6 +124,10 @@
       document.getElementById('uniqBox').textContent = uniqnames.join('\n');
       document.getElementById('spreadsheetBox').textContent = spreadsheet.trim();
       document.getElementById('csvCopyBuffer').value = spreadsheet.trim();
+    }
+
+    function titleCaseName(name) {
+      return name.replace(/\b\w/g, letter => letter.toUpperCase());
     }
 
     function copyOriginal() {
